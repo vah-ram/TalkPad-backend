@@ -18,7 +18,7 @@ app.use(cors());
 app.use('/api/auth', signRouter);
 app.use('/api/messages', messageRouter);
 
-mongoose.connect(mongoose.connect('mongodb+srv://Vahram:vahram12345@cluster0.powdqsm.mongodb.net/SpeakPadmongodb+srv://Vahram:vahram12345@cluster0.powdqsm.mongodb.net/SpeakPad'))
+mongoose.connect(process.env.MONGO_URL)
     .then(() => console.log("MongoDb connected!!!"))
     .catch(err => console.log(err));
 
@@ -29,7 +29,7 @@ const server = app.listen( PORT, () => {
 
 const io = new Server(server, {
     cors: {
-        origin: 'https://talkpad22.onrender.com',
+        origin: 'http://talkpad.free.nf',
         credentials: true
       }
 });
