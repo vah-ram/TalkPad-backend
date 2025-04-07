@@ -18,7 +18,10 @@ app.use(cors());
 app.use('/api/auth', signRouter);
 app.use('/api/messages', messageRouter);
 
-mongoose.connect(process.env.MONGO_URL)
+mongoose.connect('mongodb+srv://Vahram:vahram12345@cluster0.powdqsm.mongodb.net/SpeakPad', {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
     .then(() => console.log("MongoDb connected!!!"))
     .catch(err => console.log(err));
 
