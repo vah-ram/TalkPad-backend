@@ -1,11 +1,12 @@
 import Message from '../models/messageModel.js';
 
 export const addMessage = async(req,res,next) => {
-    const { from,to,message } = req.body;
+    const { from,to,message,image } = req.body;
 
     try {
         await Message.create({
             message: message,
+            imageUrl: image,
             users: [from,to],
             sender: from
         })
@@ -26,6 +27,7 @@ export const getMessage = async(req,res,next) => {
             return {
                 fromSelf: user.sender === sender ? true : false,
                 message: user.message,
+                image: user.image
             };
         });
     

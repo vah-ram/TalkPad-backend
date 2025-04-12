@@ -4,7 +4,15 @@ const messageSchema = new mongoose.Schema(
   {
     message: {
       type: String,
-      required: true,
+      required: false,
+    },
+    imageUrl: {
+      type: String,
+      required: false,
+    },
+    audioUrl: {
+      type: String,
+      required: false,
     },
     users: Array,
     sender: {

@@ -60,3 +60,63 @@ export const getAllUsers = async( req,res,next ) => {
         next(err)
     }
 };
+
+
+export const addContacts = async( req,res,next ) => {
+    const { myId,contact } = req.body;
+
+    try {
+        const user = await User.findOne({ _id: myId });
+
+        const isExist = user.contacts.some((item) => {
+            return item._id.toString() === contact._id.toString()
+        })
+
+        if(!isExist) {
+            user.contacts.push(contact); 
+            await user.save(); 
+        };
+
+        return user.contacts
+    } catch(err) {
+        next(err)
+    }
+};
+
+export const getContacts = async (req, res, next) => {
+    const { myId } = req.body;
+
+    try {
+      const user = await User.findOne({ _id: myId });
+  
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+  
+      res.json(user.contacts); 
+    } catch (err) {
+      next(err);
+    }
+  };
+  
+
+  export const deleteContacts = async (req, res, next) => {
+    const { myId, contactId } = req.body;
+
+    try {
+      const result = await User.findByIdAndUpdate(
+        myId,
+        {
+            $pull: {
+                contacts: { _id: contactId },
+            },
+        },
+        { new: true }
+      );
+
+      res.status(200).json({ message: 'Contact deleted successfully', result });
+    } catch (err) {
+      next(err);
+    }
+  };
+  

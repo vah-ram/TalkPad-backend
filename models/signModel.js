@@ -15,12 +15,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  contacts: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
-    }
-  ],
+  contacts: Array,
   isAvatarSet: {
     type: Boolean,
     default: false,
