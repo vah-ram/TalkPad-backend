@@ -6,6 +6,8 @@ import path from 'path';
 import { Server } from 'socket.io';
 import signRouter from './routes/userRoute.js';
 import messageRouter from './routes/messageRoute.js';
+import fileRouter from './routes/fileRoute.js'
+import profileRouter from './routes/ProfileRoute.js'
 
 const PORT = process.env.PORT || 5000;
 
@@ -15,8 +17,12 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
+app.use('/uploads', express.static('uploads'));
+app.use('/uploadProfile', express.static('uploadProfile'));
 app.use('/api/auth', signRouter);
 app.use('/api/messages', messageRouter);
+app.use('/api/files', fileRouter);
+app.use('/api/user', profileRouter);
 
 mongoose.connect('mongodb+srv://Vahram:vahram12345@cluster0.powdqsm.mongodb.net/SpeakPad')
     .then(() => console.log("MongoDb connected!!!"))

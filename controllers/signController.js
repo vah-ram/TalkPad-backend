@@ -63,60 +63,62 @@ export const getAllUsers = async( req,res,next ) => {
 
 
 export const addContacts = async( req,res,next ) => {
-    const { myId,contact } = req.body;
+    const { myId,contactId } = req.body;
 
     try {
-        const user = await User.findOne({ _id: myId });
+        
+        const user = await User.findById( myId );
 
-        const isExist = user.contacts.some((item) => {
-            return item._id.toString() === contact._id.toString()
-        })
-
-        if(!isExist) {
-            user.contacts.push(contact); 
-            await user.save(); 
-        };
-
-        return user.contacts
+        if (!user.contacts.includes(contactId)) {
+            user.contacts.push(contactId);
+            await user.save()
+        } else {
+            res.status(404).json('The contact is already in contacts!')
+        }
     } catch(err) {
-        next(err)
+        console.log(err)
     }
 };
 
 export const getContacts = async (req, res, next) => {
-    const { myId } = req.body;
+    const { myId } = req.params;
 
     try {
-      const user = await User.findOne({ _id: myId });
-  
-      if (!user) {
-        return res.status(404).json({ message: "User not found" });
-      }
-  
-      res.json(user.contacts); 
+      const user = await User.findById(myId).populate("contacts", "username email avatarImg");
+     
+      return res.json(user.contacts); 
     } catch (err) {
       next(err);
     }
   };
-  
 
   export const deleteContacts = async (req, res, next) => {
     const { myId, contactId } = req.body;
 
     try {
-      const result = await User.findByIdAndUpdate(
-        myId,
-        {
-            $pull: {
-                contacts: { _id: contactId },
-            },
-        },
-        { new: true }
-      );
+      const user = await User.findById(myId);
 
-      res.status(200).json({ message: 'Contact deleted successfully', result });
+      if(user) {
+        user.contacts.pull(contactId);
+        await user.save()
+      };
+
     } catch (err) {
       next(err);
     }
   };
   
+  export const getAvatarUrl = async (req, res, next) => {
+    const { myId } = req.query;
+
+    try {
+      const user = await User.findById(myId);
+
+      if(user) {
+        return res.json(user.avatarImg)
+      };
+
+    } catch (err) {
+      next(err);
+    }
+  };

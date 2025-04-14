@@ -15,14 +15,15 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  contacts: Array,
-  isAvatarSet: {
-    type: Boolean,
-    default: false,
-  },
+  contacts: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    }
+  ],
   avatarImg: {
     type: String,
-    default: '',
+    default: 'http://localhost:5000/uploadProfile/1744654339311-user-icon.jpg',
   },
 });
 
