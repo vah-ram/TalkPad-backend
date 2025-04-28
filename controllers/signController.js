@@ -1,4 +1,5 @@
 import User from '../models/signModel.js';
+import { Group } from '../models/groupModel.js';
 import bcrypt from 'bcrypt';
 
 
@@ -54,29 +55,55 @@ export const getAllUsers = async( req,res,next ) => {
         const users = await User.find({
             username: { $regex: `^${username}`, $options: "i" }
         });
+
+        const groups = await Group.find({
+            username: { $regex: `^${username}`, $options: "i" }
+        });
     
-        return res.json(users)
+        return res.json({
+            users,
+            groups
+        });
     } catch(err) {
         next(err)
     }
 };
 
-
 export const addContacts = async( req,res,next ) => {
-    const { myId,contactId } = req.body;
+    const { myId, contactId } = req.body;
 
     try {
         
         const user = await User.findById( myId );
+        const contact = await User.findById( contactId );
 
-        if (!user.contacts.includes(contactId)) {
-            user.contacts.push(contactId);
-            await user.save()
-        } else {
-            res.status(404).json('The contact is already in contacts!')
+        const group = await Group.findById( contactId );
+
+        if(contact) {
+            if (!user.contacts.includes(contactId)) {
+                user.contacts.push(contactId);
+                await user.save()
+            }
+    
+            if (!contact.contacts.includes(myId)) {
+                contact.contacts.push(myId);
+                await contact.save()
+            }
+        }
+
+        if(group) {
+            if (!group.members.includes( myId )) {
+                group.members.push(myId),
+                await group.save();
+            }
+
+            if (!user.contacts.includes( contactId )) {
+                user.contacts.push(contactId),
+                await user.save()
+            }
         }
     } catch(err) {
-        console.log(err)
+        next(err)
     }
 };
 
@@ -84,9 +111,14 @@ export const getContacts = async (req, res, next) => {
     const { myId } = req.params;
 
     try {
-      const user = await User.findById(myId).populate("contacts", "username email avatarImg");
+      const user = await User.findById(myId).populate("contacts", "username email avatarImg type");
      
-      return res.json(user.contacts); 
+      const groups = await Group.find({ members: myId }).select("username members avatarImg type")
+
+      return res.json({
+        contacts: user.contacts,
+        groups: groups
+      }); 
     } catch (err) {
       next(err);
     }
@@ -97,11 +129,21 @@ export const getContacts = async (req, res, next) => {
 
     try {
       const user = await User.findById(myId);
+      const group = await Group.findById(contactId);
 
       if(user) {
         user.contacts.pull(contactId);
         await user.save()
       };
+
+      if(group.admin.toString() === myId.toString()) {
+        await Group.findByIdAndDelete(group._id)
+        group.members.pull(myId);
+        await group.save();
+      }else if(group) {
+            group.members.pull(myId);
+            await group.save();
+        };
 
     } catch (err) {
       next(err);

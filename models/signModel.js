@@ -6,6 +6,10 @@ const userSchema = new mongoose.Schema({
     required: true,
     unique: true,
   },
+  type: {
+    type: String,
+    default: "User"
+  },
   email: {
     type: String,
     required: true,
@@ -23,8 +27,8 @@ const userSchema = new mongoose.Schema({
   ],
   avatarImg: {
     type: String,
-    default: 'http://localhost:5000/uploadProfile/1744654339311-user-icon.jpg',
-  },
+    default: '/messageIcons/user-icon.jpg',
+  }
 });
 
 const User = mongoose.model('User', userSchema);
