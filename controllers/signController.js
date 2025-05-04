@@ -1,12 +1,13 @@
 import User from '../models/signModel.js';
 import { Group } from '../models/groupModel.js';
 import bcrypt from 'bcrypt';
-
+import nodemailer from "nodemailer";
 
 export const register = async( req,res,next ) => {
     try {
-        const { username,email,password } = req.body;
 
+        const { username,email,password } = req.body;
+        
         const isUsername = await User.findOne({ username });
             if(isUsername) {
                  return res.json({msg: "Username is already used!", status: false});
@@ -22,6 +23,7 @@ export const register = async( req,res,next ) => {
             email,
             password: hashedPassword,
         });
+
         delete user.password;
         return res.json({ status: true, user })
     } catch (err) {

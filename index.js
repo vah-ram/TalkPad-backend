@@ -36,7 +36,7 @@ const server = app.listen( PORT, () => {
 
 const io = new Server(server, {
     cors: {
-        origin: 'http://talkpad.free.nf',
+        origin: 'http://localhost:3000',
         credentials: true
       }
 });
@@ -52,28 +52,7 @@ io.on('connection', (socket) => {
 
     socket.on('join-group', (groupId) => {
         socket.join(groupId);
-    });
-
-        socket.on('send-offer', ({ to, offer, from }) => {
-            const targetSocketId = onlineUsers.get(to);
-            if (targetSocketId) {
-                io.to(targetSocketId).emit('receive-offer', { offer, from });
-            }
-        });
-        
-        socket.on('send-answer', ({ to, answer, from }) => {
-            const targetSocketId = onlineUsers.get(to);
-            if (targetSocketId) {
-                io.to(targetSocketId).emit('receive-answer', { answer, from });
-            }
-        });
-        
-        socket.on('send-ice-candidate', ({ to, candidate, from }) => {
-            const targetSocketId = onlineUsers.get(to);
-            if (targetSocketId) {
-                io.to(targetSocketId).emit('receive-ice-candidate', { candidate, from });
-            }
-        });        
+    });      
     
     socket.on('send-message', (data) => {
         const sendReceiveUser = onlineUsers.get(data.to);
